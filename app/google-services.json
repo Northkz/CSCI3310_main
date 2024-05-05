@@ -1,0 +1,172 @@
+{
+  "project_info": {
+    "project_number": "1083615471351",
+    "firebase_url": "https://splitspend-b9914-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "splitspend-b9914",
+    "storage_bucket": "splitspend-b9914.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083615471351:android:56a0c8839fd123647bd5f2",
+        "android_client_info": {
+          "package_name": "com.dsf.dsdd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI1OjkqYSyM8OVIuFYz-4a6HNjavPi18M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083615471351:android:3fdd144bad9c655a7bd5f2",
+        "android_client_info": {
+          "package_name": "com.example.split_bill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI1OjkqYSyM8OVIuFYz-4a6HNjavPi18M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083615471351:android:ff8b00db5719e86a7bd5f2",
+        "android_client_info": {
+          "package_name": "com.marsad.catchy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1083615471351-bmpq13vab6u5e5jjkff1a9d4fqm0o24f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marsad.catchy",
+            "certificate_hash": "bec6f4d6a6a7c3ea684c2027b8e966645e9d0de8"
+          }
+        },
+        {
+          "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI1OjkqYSyM8OVIuFYz-4a6HNjavPi18M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083615471351:android:06b16674b0553bae7bd5f2",
+        "android_client_info": {
+          "package_name": "dem.corp.androidmessenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI1OjkqYSyM8OVIuFYz-4a6HNjavPi18M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083615471351:android:f42c586017e0a2477bd5f2",
+        "android_client_info": {
+          "package_name": "edu.cuhk.csci3310app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1083615471351-ojrga5l2in856srsmp5lrpp3tjfn154u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.cuhk.csci3310app",
+            "certificate_hash": "bec6f4d6a6a7c3ea684c2027b8e966645e9d0de8"
+          }
+        },
+        {
+          "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI1OjkqYSyM8OVIuFYz-4a6HNjavPi18M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1083615471351-huehaaaau03r0hckih4h3usglecs3fgb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
