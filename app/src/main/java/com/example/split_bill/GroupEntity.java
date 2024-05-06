@@ -1,4 +1,4 @@
-package com.example.split_bill.Group;
+package com.example.split_bill;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey;
 @Entity(indices = {@Index(value = {"GroupName"},
         unique = true)})
 public class GroupEntity {
-    public GroupEntity(String gName) {
+    GroupEntity(String gName) {
         this.gName = gName;
     }
 

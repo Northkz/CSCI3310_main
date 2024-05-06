@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.split_bill.Group.GroupListActivity;
+import com.example.split_bill.chats.ChatFragment;
 import com.example.split_bill.Members.MembersTabFragment;
 import com.google.android.material.tabs.TabLayout;
 
@@ -24,7 +25,7 @@ public class HandleOnGroupClickActivity extends AppCompatActivity {
          * Hence, we can load all the members and bills of the group the user clicked on in GroupList Activity*/
         Intent intent = getIntent();
         String gName = intent.getStringExtra(GroupListActivity.EXTRA_TEXT_GNAME);
-
+        String chatId = intent.getStringExtra("groupId");
         TabLayout tabLayout = findViewById(R.id.tablayout_id);
         ViewPager viewPager = findViewById(R.id.viewpager_id);
 
@@ -40,11 +41,12 @@ public class HandleOnGroupClickActivity extends AppCompatActivity {
         // create adapter for viewpager and add all three fragments/tabs to this adapter
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         // pass along the group name so that the fragment can generate all the members of the group the user clicked on in GroupList activity
-        adapter.addFragment(MembersTabFragment.newInstance(gName),"Members");
+        adapter.addFragment(MembersTabFragment.newInstance(gName, chatId),"Members");
         // pass along the group name so that the fragment can generate all the expenses of the group the user clicked on in GroupList activity
         adapter.addFragment(ExpensesTabFragment.newInstance(gName),"Expenses");
         // pass along the group name so that the fragment can generate all the balances of the group the user clicked on in GroupList activity
         adapter.addFragment(BalancesTabFragment.newInstance(gName),"Balances");
+        adapter.addFragment(ChatFragment.newInstance(chatId),"Chat");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);

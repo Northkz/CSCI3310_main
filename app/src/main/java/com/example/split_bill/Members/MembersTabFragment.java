@@ -14,30 +14,40 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.split_bill.AddEditMemberActivity;
 import com.example.split_bill.R;
+import com.example.split_bill.users.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.example.split_bill.databinding.FragmentGroupMembersBinding;
+import com.example.split_bill.Members.MemberAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MembersTabFragment extends Fragment {
+    private FragmentGroupMembersBinding binding;
+
     private MemberViewModel memberViewModel;
     private String gName; // group name
+    private String groupId; // group Id
     private MembersTabViewAdapter adapter;
     private List<MemberEntity> members = new ArrayList<>(); // maintain a list of all the existing members of the group from the database
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
 
-    public static MembersTabFragment newInstance(String gName) {
+
+    public static MembersTabFragment newInstance(String gName, String groupId) {
         Bundle args = new Bundle();
         args.putString("group_name", gName);
+        args.putString("group_id", groupId);
         MembersTabFragment f = new MembersTabFragment();
         f.setArguments(args);
         return f;
@@ -46,67 +56,23 @@ public class MembersTabFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.members_fragment,container,false);
-        if(getArguments() == null) {
-            return view;
-        }
+        binding = FragmentGroupMembersBinding.inflate(inflater, container, false);
+
+        loadUsers(groupId);
+
         gName = getArguments().getString("group_name"); // get group name from bundle
-
-        // prepare recycler view for displaying all members of the group
-        RecyclerView recyclerView = view.findViewById(R.id.membersRecyclerView);
-        recyclerView.setHasFixedSize(true);
-        if(getActivity() != null) {
-            adapter = new MembersTabViewAdapter(gName,getActivity().getApplication(),this);
-        }
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(adapter);
-
-        // if data in database(MemberEntity) changes, call the onChanged() below and recreate recycler view
-        memberViewModel = new ViewModelProvider(this,new MemberViewModelFactory(getActivity().getApplication(),gName)).get(MemberViewModel.class);
-        memberViewModel.getAllMembers().observe(getViewLifecycleOwner(), new Observer<List<MemberEntity>>() {
-            @Override
-            public void onChanged(List<MemberEntity> memberEntities) {
-                adapter.storeToList(memberEntities); // Recreate the recycler view by passing the new List<MemberEntity> to the adapter
-                members = memberEntities;
-            }
-        });
-
-
-        // Implement Add new member function
-        FloatingActionButton addFloating = view.findViewById(R.id.membersFragmentAdd); // floating button for add new member
-        addFloating.setOnClickListener(new View.OnClickListener() {
+        groupId = getArguments().getString("group_id");
+        binding.membersFragmentAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // create an add member intent
+                // Create an intent to start the AddEditMemberActivity
                 Intent intent = new Intent(getActivity(), AddEditMemberActivity.class);
-                intent.putExtra("groupName",gName);
-                intent.putExtra("requestCode",1); // using requestCode(value = 1) to identify add member intent
-                if(getActivity() != null) {
-                    getActivity().startActivityFromFragment(MembersTabFragment.this,intent,1);
-                }
+                intent.putExtra("groupId", groupId);
+                startActivity(intent);
             }
         });
 
-        // implement edit member intent
-        // create new MembersTabViewAdapter.OnItemClickListener interface object and pass it as a parameter to MembersTabViewAdapter.setOnItemClickListener method
-        adapter.setOnItemClickListener(new MembersTabViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(MemberEntity member) {
-                // create an edit member intent
-                Intent intent = new Intent(getActivity(), AddEditMemberActivity.class);
-                intent.putExtra("memberName",member.name);
-                intent.putExtra("requestCode",2); // // using requestCode(value = 2) to identify edit member intent
-                intent.putExtra("avatarResource",member.mAvatar);
-                intent.putExtra("memberId",member.id);
-                intent.putExtra("groupName",gName);
-
-                if(getActivity() != null) {
-                    getActivity().startActivityFromFragment(MembersTabFragment.this,intent,2); // launch the intent
-                }
-            }
-        });
-
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -129,16 +95,50 @@ public class MembersTabFragment extends Fragment {
             return super.onOptionsItemSelected(item);
         }
     }
+    private void loadUsers(String groupId){
+        ArrayList<User> users = new ArrayList<>();
+        FirebaseDatabase.getInstance().getReference().child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot userSnapshot : snapshot.getChildren()){
 
-    @Override
-    public void onPause() {
-        // close ActionMode if the user decides to leave the fragment while multiSelect is ON
-        if(adapter.multiSelect) {
-            adapter.actionMode.finish();
-            adapter.multiSelect = false;
-            adapter.selectedItems.clear();
-            adapter.notifyDataSetChanged();
-        }
-        super.onPause();
+                    String groups = userSnapshot.child("groups").getValue(String.class);
+                    if (groups != null && isUserInGroup(groups, groupId)) {
+                        String uid = userSnapshot.getKey();
+                        String username = userSnapshot.child("username").getValue(String.class);
+                        String profileImage = userSnapshot.child("profileImage").getValue(String.class);
+
+                        users.add(new User(uid, username, profileImage));
+                    }
+                }
+
+                binding.usersRv.setLayoutManager(new LinearLayoutManager(getContext()));
+                binding.usersRv.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+                binding.usersRv.setAdapter(new MemberAdapter(users));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle possible errors
+            }
+        });
     }
+
+    /**
+     * Helper method to check if the user is in the specific group.
+     * It splits the groups string by commas and checks if the list contains the groupId.
+     * @param groups Comma-separated string of group IDs.
+     * @param groupId The groupId to check.
+     * @return true if the groupId is in the list of groups, false otherwise.
+     */
+    private boolean isUserInGroup(String groups, String groupId) {
+        String[] groupArray = groups.split(",");
+        for (String group : groupArray) {
+            if (group.trim().equals(groupId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

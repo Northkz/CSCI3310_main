@@ -26,7 +26,7 @@ import java.util.List;
 /* Note that this activity can act as a Add Member Activity or Edit Member Activity based on the intent data we receive*/
 public class AddEditMemberActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText editText;
-    private String gName;
+    private String groupId;
     private int requestCode;
     private int userId;
     private int avatarResource;
@@ -41,17 +41,17 @@ public class AddEditMemberActivity extends AppCompatActivity implements AdapterV
             return;
         }
 
-        MemberViewModel memberViewModel = new ViewModelProvider(this,new MemberViewModelFactory(getApplication(),gName)).get(MemberViewModel.class);
+        MemberViewModel memberViewModel = new ViewModelProvider(this,new MemberViewModelFactory(getApplication(), groupId)).get(MemberViewModel.class);
 
         if(requestCode == 1) { // 1 for Add Member Activity
             // store the name in database
-            MemberEntity member = new MemberEntity(name,gName);
+            MemberEntity member = new MemberEntity(name, groupId);
             member.setMAvatar(avatarResource);
             memberViewModel.insert(member);
         }
 
         if(requestCode == 2) { // 2 for Edit Member Activity
-            MemberEntity member = new MemberEntity(name,gName);
+            MemberEntity member = new MemberEntity(name, groupId);
 
             if(userId == -1) {
                 Toast.makeText(this, "Member could not be updated", Toast.LENGTH_SHORT).show();
@@ -76,7 +76,7 @@ public class AddEditMemberActivity extends AppCompatActivity implements AdapterV
 
         // get data from the intent that started this activity
         Intent intent = getIntent();
-        gName = intent.getStringExtra("groupName");
+        groupId = intent.getStringExtra("groupName");
         requestCode = intent.getIntExtra("requestCode",0);
 
         // set toolbar

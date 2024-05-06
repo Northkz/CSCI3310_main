@@ -13,12 +13,14 @@ public class Group {
     private String currency;
     private List<String> members; // List of member IDs
     private Long createdAt; // Timestamp of creation
+    private String groupId;
 
     public Group() {
         // Default constructor required for calls to DataSnapshot.getValue(Group.class)
     }
 
-    public Group(String groupName, String currency, List<String> members, Long createdAt) {
+    public Group(String groupId, String groupName, String currency, List<String> members, Long createdAt) {
+        this.groupId = groupId;
         this.groupName = groupName;
         this.currency = currency;
         this.members = members;
@@ -27,6 +29,14 @@ public class Group {
 
     public String getGroupName() {
         return groupName;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getGroupId() {
+        return groupId;
     }
 
     public void setGroupName(String groupName) {

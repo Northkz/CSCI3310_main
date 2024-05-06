@@ -62,6 +62,7 @@ public class GroupListActivity extends AppCompatActivity {
     private void onGroupClick(Group group) {
         Intent intent = new Intent(GroupListActivity.this, HandleOnGroupClickActivity.class);
         intent.putExtra(EXTRA_TEXT_GNAME, group.getGroupName());
+        intent.putExtra("groupId", group.getGroupId());
         startActivity(intent);
     }
 

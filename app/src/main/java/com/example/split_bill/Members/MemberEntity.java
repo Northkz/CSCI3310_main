@@ -6,7 +6,7 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import com.example.split_bill.Group.GroupEntity;
+import com.example.split_bill.GroupEntity;
 
 // Column "GroupName" has a foreign key reference to column "GroupName" of GroupEntity
 @Entity(foreignKeys = @ForeignKey(entity = GroupEntity.class,

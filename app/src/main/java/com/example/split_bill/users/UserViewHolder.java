@@ -11,8 +11,8 @@ import com.example.split_bill.R;
 
 public class UserViewHolder extends RecyclerView.ViewHolder {
 
-    CircleImageView profileImage_iv;
-    TextView username_tv;
+    public CircleImageView profileImage_iv;
+    public TextView username_tv;
 
     public UserViewHolder(@NonNull View itemView) {
         super(itemView);

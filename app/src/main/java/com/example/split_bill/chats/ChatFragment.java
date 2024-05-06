@@ -1,10 +1,13 @@
 package com.example.split_bill.chats;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,41 +23,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import com.example.split_bill.databinding.ActivityChatBinding;
+import com.example.split_bill.databinding.FragmentChatBinding;
 import com.example.split_bill.chats.message.Message;
 import com.example.split_bill.chats.message.MessagesAdapter;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatFragment extends Fragment {
 
-    private ActivityChatBinding binding;
+    private FragmentChatBinding binding;
+    private String chatId;
+
+    public static ChatFragment newInstance(String chatId) {
+        ChatFragment fragment = new ChatFragment();
+        Bundle args = new Bundle();
+        args.putString("chatId", chatId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityChatBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentChatBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
-        String chatId = getIntent().getStringExtra("chatId");
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        chatId = getArguments() != null ? getArguments().getString("chatId") : null;
         loadMessages(chatId);
 
         binding.sendMessageBtn.setOnClickListener(v -> {
             String message = binding.messageEt.getText().toString();
             if (message.isEmpty()){
-                Toast.makeText(this, "Message field cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Message field cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
             String date = simpleDateFormat.format(new Date());
 
-            binding.messageEt.setText(""); //clearing the edit text
+            binding.messageEt.setText(""); // Clearing the edit text
             sendMessage(chatId, message, date);
         });
     }
 
     private void sendMessage(String chatId, String message, String date){
-        if (chatId==null) return;
+        if (chatId == null) return;
 
         HashMap<String, String> messageInfo = new HashMap<>();
         messageInfo.put("text", message);
@@ -66,7 +81,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadMessages(String chatId){
-        if (chatId==null) return;
+        if (chatId == null) return;
 
         FirebaseDatabase.getInstance().getReference().child("Chats")
                 .child(chatId).child("messages").addValueEventListener(new ValueEventListener() {
@@ -84,7 +99,7 @@ public class ChatActivity extends AppCompatActivity {
                             messages.add(new Message(messageId, ownerId, text, date));
                         }
 
-                        binding.messagesRv.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+                        binding.messagesRv.setLayoutManager(new LinearLayoutManager(getContext()));
                         binding.messagesRv.setAdapter(new MessagesAdapter(messages));
                     }
 

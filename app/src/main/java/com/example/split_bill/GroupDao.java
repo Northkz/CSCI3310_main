@@ -7,8 +7,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.split_bill.Group.GroupEntity;
-
 import java.util.List;
 
 @Dao

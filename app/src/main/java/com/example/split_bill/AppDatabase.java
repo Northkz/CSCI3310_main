@@ -5,7 +5,6 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.example.split_bill.Group.GroupEntity;
 import com.example.split_bill.Members.MemberEntity;
 
 @Database(entities = {MemberEntity.class,BillEntity.class, GroupEntity.class}, version = 1,exportSchema = false)

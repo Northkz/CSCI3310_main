@@ -14,7 +14,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-import com.example.split_bill.chats.ChatActivity;
 import com.example.split_bill.R;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatViewHolder>{
@@ -68,7 +67,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatViewHolder>{
 
         // Set click listener to open chat
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), ChatActivity.class);
+            Intent intent = new Intent(holder.itemView.getContext(), ChatFragment.class);
 
             intent.putExtra("chatId", chats.get(position).getChats());
             holder.itemView.getContext().startActivity(intent);

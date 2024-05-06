@@ -6,7 +6,6 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import com.example.split_bill.Group.GroupEntity;
 import com.example.split_bill.Members.MemberEntity;
 
 // Column "MemberId" has a foreign key reference to column "Id" of MemberEntity.

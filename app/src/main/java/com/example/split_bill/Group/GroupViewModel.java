@@ -30,8 +30,13 @@ public class GroupViewModel extends AndroidViewModel {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Group> groupList = new ArrayList<>();
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
                     Group group = snapshot.getValue(Group.class);
+                    if (group != null) {
+                        group.setGroupId(snapshot.getKey());  // Set the groupId here
+                    }
                     groupList.add(group);
                 }
                 allGroups.postValue(groupList);

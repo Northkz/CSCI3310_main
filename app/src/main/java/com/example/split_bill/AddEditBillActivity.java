@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.split_bill.Group.GroupEntity;
 import com.example.split_bill.Group.GroupListActivity;
 import com.example.split_bill.Group.GroupViewModel;
 import com.example.split_bill.Members.MemberEntity;
