@@ -57,4 +57,12 @@ public class AllMembersSpinnerAdapter extends ArrayAdapter<MemberEntity> {
         }
         return -1;
     }
+    public int getMemberIdByName(String memberName) {
+        for (MemberEntity member : list) {
+            if (member != null && member.getName().equals(memberName)) {
+                return member.getId();
+            }
+        }
+        return 1; // Return 0 if the member with the given name is not found
+    }
 }

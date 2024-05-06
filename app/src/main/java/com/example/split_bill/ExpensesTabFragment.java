@@ -2,6 +2,7 @@ package com.example.split_bill;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,12 @@ import com.example.split_bill.Members.MemberEntity;
 import com.example.split_bill.Members.MemberViewModel;
 import com.example.split_bill.Members.MemberViewModelFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +41,12 @@ public class ExpensesTabFragment extends Fragment {
     private ExpensesTabViewAdapter adapter;
     private StringBuilder currency = new StringBuilder();
 
-    static ExpensesTabFragment newInstance(String gName) {
+    private String groupId;
+
+    static ExpensesTabFragment newInstance(String gName, String groupId) {
         Bundle args = new Bundle();
         args.putString("group_name", gName);
+        args.putString("group_id", groupId);
         ExpensesTabFragment f = new ExpensesTabFragment();
         f.setArguments(args);
         return f;
@@ -56,12 +66,14 @@ public class ExpensesTabFragment extends Fragment {
             return view;
         }
         gName = getArguments().getString("group_name"); // get group name from bundle
+        groupId = getArguments().getString("group_id"); // get group ID from bundle
 
+        Log.d("GroupID", "Group ID: " + groupId);
         // prepare recycler view for displaying all expenses of the group
         RecyclerView recyclerView = view.findViewById(R.id.expensesRecyclerView);
         recyclerView.setHasFixedSize(true);
         if(getActivity() != null) {
-            adapter = new ExpensesTabViewAdapter(gName, getActivity().getApplication(), this);
+            adapter = new ExpensesTabViewAdapter(gName, getActivity().getApplication(), this, members);
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
@@ -81,54 +93,87 @@ public class ExpensesTabFragment extends Fragment {
             }
         });
 
-        // get all the existing members from the database
-        MemberViewModel memberViewModel = new ViewModelProvider(this,new MemberViewModelFactory(getActivity().getApplication(),gName)).get(MemberViewModel.class);
-        memberViewModel.getAllMembers().observe(getViewLifecycleOwner(), new Observer<List<MemberEntity>>() {
+        // get all the existing members from the database using the group ID
+        DatabaseReference membersRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupId).child("members");
+        membersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChanged(List<MemberEntity> memberEntities) {
-                members = memberEntities;
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot memberSnapshot : dataSnapshot.getChildren()) {
+                    String memberId = memberSnapshot.getValue(String.class);
+//                    System.out.println("memberid" + memberId);
+                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(memberId);
+                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                            if (userDataSnapshot.exists()) {
+                                String username = userDataSnapshot.child("username").getValue(String.class);
+                                String email = userDataSnapshot.child("email").getValue(String.class);
+                                String profileImage = userDataSnapshot.child("profileImage").getValue(String.class);
+                                MemberEntity member = new MemberEntity(username, gName);
+                                members.add(member); // Add member to the list
+                            } else {
+                                Toast.makeText(getActivity(), "Failed to retrieve group members based on id. Please try again later.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            // Handle errors
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle error
+                Toast.makeText(getActivity(), "Failed to retrieve group members. Please try again later.", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         // Implement Add new expense function
         FloatingActionButton addFloating = view.findViewById(R.id.expensesFragmentAdd);
         addFloating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // create an add expense intent
-                if(!members.isEmpty() && getActivity() != null) { // condition prevents launching an add bill activity if there are no existing members of the group
+                // Launch AddEditBillActivity only if members are not empty
+                if (!members.isEmpty() && getActivity() != null) {
                     Intent intent = new Intent(getActivity(), AddEditBillActivity.class);
-                    intent.putExtra(GroupListActivity.EXTRA_TEXT_GNAME,gName);
+                    intent.putExtra(GroupListActivity.EXTRA_TEXT_GNAME, gName);
+                    intent.putExtra("groupId",groupId );
                     intent.putExtra("groupCurrency", currency.toString());
-                    intent.putExtra("requestCode",1); // using requestCode(value = 1) to identify add expense intent
-                    getActivity().startActivityFromFragment(ExpensesTabFragment.this,intent,1);
+                    intent.putExtra("requestCode", 1); // using requestCode(value = 1) to identify add expense intent
+                    getActivity().startActivityFromFragment(ExpensesTabFragment.this, intent, 1);
                 } else {
+                    // Display toast message if no members are found
                     Toast.makeText(getActivity(), "No members found. Please add some members.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+
+
         // implement edit expense function
         // create new ExpensesTabViewAdapter.OnItemClickListener interface object and pass it as a parameter to ExpensesTabViewAdapter.setOnItemClickListener method
-        adapter.setOnItemClickListener(new ExpensesTabViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BillEntity bill) {
-                // create an edit expense intent
-                Intent intent = new Intent(getActivity(), AddEditBillActivity.class);
-                intent.putExtra("billId",bill.id);
-                intent.putExtra("billPaidBy",bill.paidBy);
-                intent.putExtra("billCost",bill.cost);
-                intent.putExtra("billMemberId",bill.mid);
-                intent.putExtra("billName",bill.item);
-                intent.putExtra("groupCurrency", currency.toString());
-                intent.putExtra(GroupListActivity.EXTRA_TEXT_GNAME,bill.gName);
-                intent.putExtra("requestCode",2); // using requestCode(value = 2) to identify edit expense intent
-
-                if(getActivity() != null) {
-                    getActivity().startActivityFromFragment(ExpensesTabFragment.this, intent, 2); // launch the intent
-                }
-            }
-        });
+//        adapter.setOnItemClickListener(new ExpensesTabViewAdapter.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(BillEntity bill) {
+//                // create an edit expense intent
+//                Intent intent = new Intent(getActivity(), AddEditBillActivity.class);
+//                intent.putExtra("billId",bill.id);
+//                intent.putExtra("billPaidBy",bill.paidBy);
+//                intent.putExtra("billCost",bill.cost);
+//                intent.putExtra("billMemberId",bill.mid);
+//                intent.putExtra("billName",bill.item);
+//                intent.putExtra("groupCurrency", currency.toString());
+//                intent.putExtra(GroupListActivity.EXTRA_TEXT_GNAME,bill.gName);
+//                intent.putExtra("requestCode",2); // using requestCode(value = 2) to identify edit expense intent
+//
+//                if(getActivity() != null) {
+//                    getActivity().startActivityFromFragment(ExpensesTabFragment.this, intent, 2); // launch the intent
+//                }
+//            }
+//        });
 
         return view;
     }
