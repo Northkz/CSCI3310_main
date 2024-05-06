@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.split_bill.Members.MemberEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,18 +26,25 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
     private List<BillEntity> list = new ArrayList<>(); // maintain a list of all the existing bills in the database
     boolean multiSelect = false; // true if user has selected any item
     List<BillEntity> selectedItems = new ArrayList<>();
+    private List<MemberEntity> members = new ArrayList<>();
     ActionMode actionMode;
     private String gName;
     private String currency;
     private Application application;
     private ExpensesTabFragment thisOfExpenseFragment;
+    private List<String> memberIds = new ArrayList<>();
 
-    ExpensesTabViewAdapter(String gName, Application application, ExpensesTabFragment thisOfExpenseFragment) {
+    ExpensesTabViewAdapter(String gName, Application application, ExpensesTabFragment thisOfExpenseFragment, List<MemberEntity> members) {
         this.gName = gName;
         this.application = application;
         this.thisOfExpenseFragment = thisOfExpenseFragment;
+        this.members = members; // Initialize the members list
     }
 
+    public void updateMembers(List<MemberEntity> members) {
+        this.members = members;
+        notifyDataSetChanged(); // Notify adapter that data set has changed
+    }
     /*
     handles all kinds of action when ActionMode is active.
     In our case, when the user does a long click on any recycler view item, ActionMode is activated
@@ -82,6 +92,7 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
         private TextView textViewCurrency;
         private TextView textViewPaidBy;
         private RelativeLayout relativeLayout;
+        private TextView textViewId;
 
         ExpenseDetailViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -145,11 +156,18 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
     public void onBindViewHolder(@NonNull ExpenseDetailViewHolder holder, int position) {
         StringBuilder justText = new StringBuilder();
         justText.append("Paid By: ");
+        String paidById = "";
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).getName().equals(list.get(position).paidBy)) {
+                paidById = memberIds.get(i);
+                break;
+            }
+        }
         final ExpenseDetailViewHolder hold = holder;
         holder.textViewItem.setText(list.get(position).item); // set bill item to holder
         holder.textViewCost.setText(list.get(position).cost); // set bill cost to holder
-        holder.textViewPaidBy.setText(justText.append(list.get(position).paidBy)); // set bill paidBy to holder
         holder.textViewCurrency.setText(Character.toString(currency.charAt(5))); // set bill currency to holder. charAt(5) holds the currency symbol(like in USD-($))
+        holder.textViewId.setText(paidById);
         holder.update(list.get(position));
 
         final int pos = position;

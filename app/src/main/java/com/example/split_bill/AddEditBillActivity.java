@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,6 +25,20 @@ import com.example.split_bill.Group.GroupViewModel;
 import com.example.split_bill.Members.MemberEntity;
 import com.example.split_bill.Members.MemberViewModel;
 import com.example.split_bill.Members.MemberViewModelFactory;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,10 +51,12 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
     private EditText editTextCost;
     private String currency;
     private String gName;
+    private String groupId;
     private String paidBy;
-    private int memberId;
+    private String memberId;
     private int requestCode;
     private int billId;
+    List<MemberEntity> membersArr = new ArrayList<>();
 
     private void saveExpense() {
         String item = editTextItem.getText().toString();
@@ -50,27 +67,45 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
             Toast.makeText(this, "Please enter a valid input", Toast.LENGTH_SHORT).show();
             return;
         }
+        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference().child("Groups");
 
-        BillViewModel billViewModel = new ViewModelProvider(this,new BillViewModelFactory(getApplication(),gName)).get(BillViewModel.class);
 
-        if(requestCode == 1) { // 1 for Add Bill Activity
+
+        if (requestCode == 1) { // 1 for Add Bill Activity
             // Round up the cost of the bill to 2 decimal places
             BigDecimal decimal = new BigDecimal(cost);
             BigDecimal res = decimal.setScale(2, RoundingMode.HALF_EVEN);
 
-            // store to database
-//            Log.d("1", Integer.toString(memberId));
-            billViewModel.insert(new BillEntity(memberId,item,res.toString(),gName,paidBy));
-        }
+            // Create a new expense object
+            Expense expense = new Expense(memberId, item, res.toString(), gName, paidBy, currency);
 
-        if(requestCode == 2) { // 2 for Edit Bill Activity
-            BillEntity bill = new BillEntity(memberId,item,cost,gName,paidBy);
-            bill.setId(billId);
+            // Get a reference to the "expenses" node within the group in the Firebase Realtime Database
+            DatabaseReference expensesRef = groupsRef.child(groupId).child("expenses").push();
 
-            /* update the database. note that update operation in billViewModel looks for a row in BillEntity where the value of column("Id")  = billId
-               and if found, updates other columns in the row */
-            billViewModel.update(bill);
+            // Push the expense to the expenses node
+            expensesRef.setValue(expense)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(AddEditBillActivity.this, "Expense added successfully", Toast.LENGTH_SHORT).show();
+                            finish(); // Close the activity after adding the expense
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(AddEditBillActivity.this, "Failed to add expense", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
+//        if(requestCode == 2) { // 2 for Edit Bill Activity
+//            BillEntity bill = new BillEntity(memberId,item,cost,gName,paidBy);
+//            bill.setId(billId);
+//
+//            /* update the database. note that update operation in billViewModel looks for a row in BillEntity where the value of column("Id")  = billId
+//               and if found, updates other columns in the row */
+//            billViewModel.update(bill);
+//        }
 
         // updates the group currency
         GroupViewModel groupViewModel = new ViewModelProvider(this).get(GroupViewModel.class);
@@ -119,10 +154,10 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
 
         // get data from the intent that started this activity
         Intent intent = getIntent();
-        gName = intent.getStringExtra(GroupListActivity.EXTRA_TEXT_GNAME);
         // requestCode == 1 identifies an add bill intent and requestCode == 2 identifies an edit Bill intent
         requestCode = intent.getIntExtra("requestCode",0);
-        memberId = intent.getIntExtra("billMemberId",-1);
+        memberId = intent.getStringExtra("billMemberId");
+        groupId = intent.getStringExtra("groupId");
         billId = intent.getIntExtra("billId",-1);
         currency = intent.getStringExtra("groupCurrency");
 
@@ -147,22 +182,29 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
 
 
         // get all current members of the group
-        MemberViewModel memberViewModel = new ViewModelProvider(this,new MemberViewModelFactory(getApplication(),gName)).get(MemberViewModel.class);
-        memberViewModel.getAllMembers().observe(this, new Observer<List<MemberEntity>>() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DatabaseReference membersRef = FirebaseDatabase.getInstance()
+                .getReference().child("Groups").child(groupId).child("members");
+
+        membersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChanged(List<MemberEntity> memberEntities) {
-                allMembersSpinnerAdapter.clear();
-                allMembersSpinnerAdapter.addAll(memberEntities);
-                allMembersSpinnerAdapter.notifyDataSetChanged();
-
-                if(requestCode == 2) {
-                    MemberEntity member = new MemberEntity(paidBy,gName);
-                    member.setId(memberId);
-                    int spinnerPositionPaidBy = allMembersSpinnerAdapter.getPosition(member);
-                    spinnerPaidBy.setSelection(spinnerPositionPaidBy);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> memberIds = new ArrayList<>();
+                for (DataSnapshot memberSnapshot : dataSnapshot.getChildren()) {
+                    String memberId = memberSnapshot.getValue(String.class);
+                    if (memberId != null) {
+                        memberIds.add(memberId);
+                    }
                 }
+                // Now fetch member entities based on member IDs
+                fetchMemberEntities(memberIds, allMembersSpinnerAdapter);
             }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors
+                Toast.makeText(AddEditBillActivity.this, "Failed to retrieve group members. Please try again later.", Toast.LENGTH_SHORT).show();
 
+            }
         });
 
         if(intent.hasExtra("billId")) {
@@ -177,6 +219,33 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
         }
 
     }
+    private void fetchMemberEntities(List<String> memberIds, final AllMembersSpinnerAdapter allMembersSpinnerAdapter) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    String memberId = userSnapshot.getKey();
+                    if (memberIds.contains(memberId)) {
+                        String username = userSnapshot.child("username").getValue(String.class);
+                        MemberEntity member = new MemberEntity(username, gName);
+                        membersArr.add(member);
+                    }
+                }
+                allMembersSpinnerAdapter.clear();
+                allMembersSpinnerAdapter.addAll(membersArr);
+                allMembersSpinnerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle failure
+                Toast.makeText(AddEditBillActivity.this, "Failed to retrieve group members. Please try again later.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
 
     public String PerfectDecimal(String str, int MAX_BEFORE_POINT, int MAX_DECIMAL){
@@ -226,16 +295,17 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
             case R.id.addBillItemCurrencySpinner:
                 currency = parent.getItemAtPosition(position).toString();
                 break;
-//                Log.d("p", "selected currency");
             case R.id.addBillItemPaidBy:
-//                Log.d("t", "selected paidBy");
+                Log.d("t", "selected paidBy");
                 MemberEntity member = (MemberEntity) parent.getItemAtPosition(position);
                 paidBy = member.name;
-                memberId = member.id;
+                System.out.println("selected paidBy"+ paidBy);
+                memberId = String.valueOf(member.id);
                 break;
             default:break;
         }
     }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {

@@ -18,6 +18,7 @@ import com.example.split_bill.GroupEntity;
             @Index(name="GroupNameIndexMember",value = {"GroupName"})
         })
 public class MemberEntity {
+
     public MemberEntity(String name, String gName) {
         this.name = name;
         this.gName = gName;
@@ -42,5 +43,12 @@ public class MemberEntity {
 
     public void setMAvatar(int mAvatar) {
         this.mAvatar = mAvatar;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+    public int getId(){
+        return this.id;
     }
 }
