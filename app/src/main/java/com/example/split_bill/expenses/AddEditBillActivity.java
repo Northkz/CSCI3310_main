@@ -91,14 +91,7 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
                         }
                     });
         }
-//        if(requestCode == 2) { // 2 for Edit Bill Activity
-//            BillEntity bill = new BillEntity(memberId,item,cost,gName,paidBy);
-//            bill.setId(billId);
-//
-//            /* update the database. note that update operation in billViewModel looks for a row in BillEntity where the value of column("Id")  = billId
-//               and if found, updates other columns in the row */
-//            billViewModel.update(bill);
-//        }
+
 
         // updates the group currency
         GroupViewModel groupViewModel = new ViewModelProvider(this).get(GroupViewModel.class);
@@ -125,8 +118,6 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
 
         editTextCost = findViewById(R.id.addBillItemCost);
 
-        // Create checkboxes for each student
-        // makes sure the user can enter up to 2 decimal places only in item cost field
         editTextCost.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
 
@@ -201,8 +192,6 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
         });
 
         if(intent.hasExtra("billId")) {
-            // Only edit bill intent sends "billId" with it
-            // Get data from the edit bill intent that started this activity
             setTitle("Edit expense");
             editTextItem.setText(intent.getStringExtra("billName")); // set default text received from the intent
             editTextCost.setText(intent.getStringExtra("billCost")); // set default text received from the intent

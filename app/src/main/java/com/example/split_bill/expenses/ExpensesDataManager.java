@@ -25,32 +25,6 @@ public class ExpensesDataManager {
         this.expensesList = new ArrayList<>();
     }
 
-    public void retrieveExpensesData() {
-        expensesRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<BillEntity> billEntities = new ArrayList<>();
-                // Iterate through each expense data
-                for (DataSnapshot BillSnapshot : dataSnapshot.getChildren()) {
-                    // Parse expense data into ExpenseEntity object
-                    BillEntity bill = BillSnapshot.getValue(BillEntity.class);
-                    if (bill != null) {
-                        billEntities.add(bill);
-                        System.out.println("Expense item name: " + bill.getItem());
-                        System.out.println("Expense item cost: " + bill.getCost());
-                        System.out.println("Paid by: " + bill.getPaidBy());
-                    }
-                }
-                adapter.updateExpensesList(billEntities);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle errors
-                System.out.println("Error retrieving expenses data: " + databaseError.getMessage());
-            }
-        });
-    }
     public List<BillEntity> getExpensesList() {
         return expensesList;
     }

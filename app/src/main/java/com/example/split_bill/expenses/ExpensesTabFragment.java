@@ -36,7 +36,7 @@ import java.util.List;
 
 public class ExpensesTabFragment extends Fragment {
     private String gName; // group name
-    private List<BillEntity> bills = new ArrayList<>(); // maintain a list of all the existing bills of the group from the database
+    private List<Expense> bills = new ArrayList<>(); // maintain a list of all the existing bills of the group from the database
     private List<ExpenseEntity> members = new ArrayList<>(); // maintain a list of all the existing members of the group from the database
     private BillViewModel billViewModel;
     private ExpensesTabViewAdapter adapter;
@@ -62,58 +62,18 @@ public class ExpensesTabFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.expenses_fragment,container,false);
+        View view = inflater.inflate(R.layout.expenses_fragment, container, false);
+        gName = getArguments().getString("group_name");
+        groupId = getArguments().getString("group_id");
         if(getArguments() == null) {
             return view;
         }
-        gName = getArguments().getString("group_name"); // get group name from bundle
-        groupId = getArguments().getString("group_id"); // get group ID from bundle
 
-        Log.d("GroupID", "Group ID: " + groupId);
-//        ExpensesDataManager expensesDataManager = new ExpensesDataManager(groupId);
-//        expensesDataManager.retrieveExpensesData();
-        // prepare recycler view for displaying all expenses of the group
+
         RecyclerView recyclerView = view.findViewById(R.id.expensesRecyclerView);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new ExpensesTabViewAdapter(groupId, gName, getActivity().getApplication(), this, members);
-        recyclerView.setAdapter(adapter);
-        if(getActivity() != null) {
-            adapter = new ExpensesTabViewAdapter(groupId, gName, getActivity().getApplication(), this, members);
-        }
-        ExpensesDataManager expensesDataManager = new ExpensesDataManager(groupId, adapter);
-        expensesDataManager.retrieveExpensesData();
-        expensesDataManager.setOnDataChangeListener(new ExpensesDataManager.OnDataChangeListener() {
-            @Override
-            public void onDataChange(List<BillEntity> billEntities) {
-                // Update the adapter with the new list of BillEntity objects
-                adapter.storeToList(billEntities, currency.toString());
-                // Optionally, you can store the new list locally in ExpensesTabFragment
-                bills = billEntities;
-                for (BillEntity bill : billEntities) {
-                    Log.d("BillEntity", "Item: " + bill.getItem());
-                    Log.d("BillEntity", "Cost: " + bill.getCost());
-                    Log.d("BillEntity", "Paid By: " + bill.getPaidBy());
-                    // Add more details to log if needed
-                }
-            }
-        });
-
-        // if data in database(BillEntity) changes, call the onChanged() below
-        billViewModel = new ViewModelProvider(this,new BillViewModelFactory(getActivity().getApplication(),gName)).get(BillViewModel.class);
-        billViewModel.getAllBills().observe(getViewLifecycleOwner(), new Observer<List<BillEntity>>() {
-            @Override
-            public void onChanged(List<BillEntity> billEntities) {
-                GroupViewModel groupViewModel = new ViewModelProvider(ExpensesTabFragment.this).get(GroupViewModel.class);
-                // get latest currency picked by the user
-                currency.setLength(0); // delete previous currency
-//                currency.append(groupViewModel.getGroupCurrencyNonLive(gName));
-
-                adapter.storeToList(billEntities, currency.toString()); // Recreate the recycler view by passing the new List<BillEntity> and currency to the adapter
-                bills = billEntities;
-            }
-        });
 
         // get all the existing members from the database using the group ID
         DatabaseReference membersRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupId).child("members");
@@ -122,15 +82,12 @@ public class ExpensesTabFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot memberSnapshot : dataSnapshot.getChildren()) {
                     String memberId = memberSnapshot.getValue(String.class);
-//                    System.out.println("memberid" + memberId);
                     DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(memberId);
                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
                             if (userDataSnapshot.exists()) {
                                 String username = userDataSnapshot.child("username").getValue(String.class);
-                                String email = userDataSnapshot.child("email").getValue(String.class);
-                                String profileImage = userDataSnapshot.child("profileImage").getValue(String.class);
                                 ExpenseEntity member = new ExpenseEntity(gName, username, memberId);
                                 members.add(member); // Add member to the list
                             } else {
@@ -152,6 +109,36 @@ public class ExpensesTabFragment extends Fragment {
             }
         });
 
+        if(getActivity() != null) {
+            adapter = new ExpensesTabViewAdapter(groupId, gName, getActivity().getApplication(), this, members);
+        }
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(adapter);
+
+        FirebaseDatabase.getInstance().getReference("Groups").child(groupId).child("expenses").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Expense> expensesList = new ArrayList<>();
+                // Iterate through each expense data
+                for (DataSnapshot expenseSnapshot : dataSnapshot.getChildren()) {
+
+                    Expense expense = expenseSnapshot.getValue(Expense.class);
+                    if (expense != null) {
+                        expensesList.add(expense);
+                    }
+                }
+                adapter.updateExpensesList(expensesList);
+                adapter.storeToList(expensesList, currency.toString());
+                bills = expensesList;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle errors
+                System.out.println("Error retrieving expenses data: " + databaseError.getMessage());
+            }
+        });
+
 
         // Implement Add new expense function
         FloatingActionButton addFloating = view.findViewById(R.id.expensesFragmentAdd);
@@ -167,35 +154,11 @@ public class ExpensesTabFragment extends Fragment {
                     intent.putExtra("requestCode", 1); // using requestCode(value = 1) to identify add expense intent
                     getActivity().startActivityFromFragment(ExpensesTabFragment.this, intent, 1);
                 } else {
-                    // Display toast message if no members are found
                     Toast.makeText(getActivity(), "No members found. Please add some members.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-
-
-        // implement edit expense function
-        // create new ExpensesTabViewAdapter.OnItemClickListener interface object and pass it as a parameter to ExpensesTabViewAdapter.setOnItemClickListener method
-//        adapter.setOnItemClickListener(new ExpensesTabViewAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(BillEntity bill) {
-//                // create an edit expense intent
-//                Intent intent = new Intent(getActivity(), AddEditBillActivity.class);
-//                intent.putExtra("billId",bill.id);
-//                intent.putExtra("billPaidBy",bill.paidBy);
-//                intent.putExtra("billCost",bill.cost);
-//                intent.putExtra("billMemberId",bill.mid);
-//                intent.putExtra("billName",bill.item);
-//                intent.putExtra("groupCurrency", currency.toString());
-//                intent.putExtra(GroupListActivity.EXTRA_TEXT_GNAME,bill.gName);
-//                intent.putExtra("requestCode",2); // using requestCode(value = 2) to identify edit expense intent
-//
-//                if(getActivity() != null) {
-//                    getActivity().startActivityFromFragment(ExpensesTabFragment.this, intent, 2); // launch the intent
-//                }
-//            }
-//        });
 
         return view;
     }
@@ -203,9 +166,6 @@ public class ExpensesTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize ExpensesDataManager and retrieve expenses data
-        ExpensesDataManager expensesDataManager = new ExpensesDataManager(groupId, adapter);
-        expensesDataManager.retrieveExpensesData();
     }
 
     @Override
@@ -213,29 +173,7 @@ public class ExpensesTabFragment extends Fragment {
         inflater.inflate(R.menu.expenses_fragment_menu, menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.deleteAllBills) {
-            if(!bills.isEmpty()) { // condition prevents initiating a deleteAll operation if there are no bills to delete
-                billViewModel.deleteAll(gName);
-                Toast.makeText(getActivity(), "All Expenses Deleted", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            Toast.makeText(getActivity(), "Nothing To Delete", Toast.LENGTH_SHORT).show();
-            return super.onOptionsItemSelected(item);
-        }
-            return super.onOptionsItemSelected(item);
-    }
 
-    @Override
-    public void onPause() {
-        // close ActionMode if the user decides to leave the fragment while multiSelect is ON
-        if(adapter.multiSelect) {
-            adapter.actionMode.finish();
-            adapter.multiSelect = false;
-            adapter.selectedItems.clear();
-            adapter.notifyDataSetChanged();
-        }
-        super.onPause();
-    }
+
+
 }
