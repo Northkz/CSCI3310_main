@@ -40,10 +40,11 @@ public class HandleOnGroupClickActivity extends AppCompatActivity {
         setTitle(gName);
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(ChatFragment.newInstance(chatId),"Chat");
         adapter.addFragment(MembersTabFragment.newInstance(gName, chatId),"Members");
         adapter.addFragment(ExpensesTabFragment.newInstance(gName, chatId),"Expenses");
         adapter.addFragment(BalancesTabFragment.newInstance(chatId),"Balances");
+        adapter.addFragment(ChatFragment.newInstance(chatId),"Chat");
+
 
 
         viewPager.setAdapter(adapter);

@@ -3,8 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools">
-    
+
     <LinearLayout
+        android:id="@+id/message_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -14,23 +15,33 @@
         android:layout_marginEnd="15dp"
         android:padding="10dp"
         android:background="@drawable/message_from_curr_user">
-        
+
+
+
+
         <TextView
             android:id="@+id/message_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
+            android:textSize="20sp"
             tools:text="This is message text"/>
 
+        <!-- TextView for the date -->
         <TextView
             android:id="@+id/message_date_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            tools:text="12.01.2022 13:30"
             android:textSize="13sp"
-            android:layout_marginTop="10dp"/>
-
+            android:layout_marginTop="10dp"
+            tools:text="12.01.2022 13:30"/>
+        <TextView
+            android:id="@+id/message_owner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#757575"
+            android:textSize="14sp"
+            tools:text="Username" />
     </LinearLayout>
 
 </RelativeLayout>
