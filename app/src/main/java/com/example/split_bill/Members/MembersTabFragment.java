@@ -44,16 +44,6 @@ public class MembersTabFragment extends Fragment {
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentGroupMembersBinding.inflate(inflater, container, false);
 
-        loadUsers(groupId);
-
-        gName = getArguments().getString("group_name"); // get group name from bundle
-        groupId = getArguments().getString("group_id");
-
-        return binding.getRoot();
-    }
-
-
-    private void loadUsers(String groupId){
         ArrayList<User> users = new ArrayList<>();
         FirebaseDatabase.getInstance().getReference().child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -80,7 +70,15 @@ public class MembersTabFragment extends Fragment {
                 // Handle possible errors
             }
         });
+
+        gName = getArguments().getString("group_name"); // get group name from bundle
+        groupId = getArguments().getString("group_id");
+
+        return binding.getRoot();
     }
+
+
+
 
     /**
      * Helper method to check if the user is in the specific group.
