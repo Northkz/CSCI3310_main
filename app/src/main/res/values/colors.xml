@@ -8,12 +8,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="lavendor">#8692f7</color>
+    <color name="mainCU">#f4dfb0</color>
     <color name="db">#000038</color>
     <color name="colorPrimary">#FFC107</color>
     <color name="tabTextColor">#fff</color>
     <color name="tabIndicatorColor">#272626</color>
     <color name="colorPrimaryDark">#8234ba</color>
-    <color name="colorTextMain">#3C6086</color>
+    <color name="colorTextMain">#750F6D</color>
     <color name="backgroundColor">#fcfcfc</color>
     <color name="lightGray">#ededed</color>
     <color name="deepPurple">#7c4dff</color>
@@ -27,6 +28,7 @@
 
 
     <color name="blue">#2A63F6</color>
+    <color name="cuhk">#750F6D</color>
 
     <color name="light_blue">#C0CCEC</color>
     <color name="grey">#f3f3f3</color>

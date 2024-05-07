@@ -9,11 +9,11 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="true"
-        android:label="Split-Bill"
+        android:label="CUSplit"
         android:icon="@drawable/split10"
         android:roundIcon="@drawable/split10"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SPLITBILL"
+        android:theme="@style/Theme.CUSplit"
         tools:targetApi="31">
 
         <activity
@@ -41,9 +41,6 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".authorization.LoginActivity"
-            android:exported="false" />
-        <activity
             android:name=".authorization.RegisterActivity"
             android:exported="false" />
         <activity
@@ -53,9 +50,8 @@
             android:name=".authorization.SignupActivity"
             android:exported="false" />
         <activity
-            android:name=".splash_screen"
-            android:exported="true"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+            android:name=".authorization.LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
