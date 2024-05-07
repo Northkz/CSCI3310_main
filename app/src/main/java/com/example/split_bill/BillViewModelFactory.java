@@ -9,7 +9,7 @@ public class BillViewModelFactory implements ViewModelProvider.Factory {
     private Application application;
     private String gName;
 
-    BillViewModelFactory(Application application, String gName) {
+    public BillViewModelFactory(Application application, String gName) {
         this.application = application;
         this.gName = gName;
     }

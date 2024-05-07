@@ -1,4 +1,6 @@
-package com.example.split_bill;
+package com.example.split_bill.balance;
+
+import com.example.split_bill.balance.Balance;
 
 import java.math.BigDecimal;
 import java.util.Comparator;

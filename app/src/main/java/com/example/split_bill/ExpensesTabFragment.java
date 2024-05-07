@@ -21,8 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.split_bill.Group.GroupListActivity;
 import com.example.split_bill.Group.GroupViewModel;
 import com.example.split_bill.Members.MemberEntity;
-import com.example.split_bill.Members.MemberViewModel;
-import com.example.split_bill.Members.MemberViewModelFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

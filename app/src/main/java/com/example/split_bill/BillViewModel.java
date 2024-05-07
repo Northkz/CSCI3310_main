@@ -38,7 +38,7 @@ public class BillViewModel extends AndroidViewModel {
         return allBills;
     }
 
-    List<BillEntity> getAllMemberBills(String gName, int mid) {
+    public List<BillEntity> getAllMemberBills(String gName, int mid) {
         return repository.getAllBillsForMember(gName, mid);
     }
 }

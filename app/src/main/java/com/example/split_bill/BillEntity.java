@@ -49,6 +49,7 @@ public class BillEntity {
     String paidBy;
 
     @ColumnInfo(name = "Cost")
+    public
     String cost;
 
     @ColumnInfo(name = "GroupName")
