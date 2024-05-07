@@ -1,4 +1,4 @@
-package com.example.split_bill;
+package com.example.split_bill.balance;
 
 
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.split_bill.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
