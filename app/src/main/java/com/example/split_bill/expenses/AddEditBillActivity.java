@@ -18,9 +18,13 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.location.Location;
 
 import com.example.split_bill.Group.GroupViewModel;
+import com.example.split_bill.MainActivity;
 import com.example.split_bill.R;
+import com.example.split_bill.utils.CurrencyUtil;
+import com.example.split_bill.utils.LocationUtil;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -33,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /* Note that this activity can act as a Add Bill Activity or Edit Bill Activity based on the intent data we receive*/
@@ -143,7 +148,17 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
 
         // spinner for select currency
         Spinner spinner = findViewById(R.id.addBillItemCurrencySpinner);
-        final ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,R.array.currencySymbols,android.R.layout.simple_spinner_item);
+
+        List<CharSequence> currencySymbols = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.currencySymbols)));
+        ArrayAdapter<CharSequence> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencySymbols);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        String cur = MainActivity.currencyCode;
+        Log.i("Nursultan==>", cur);
+
+        if (!currencySymbols.contains(cur)){
+            spinnerAdapter.add(cur);
+        }
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(this);

@@ -57,7 +57,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, LocationUtil.LocationResultListener {
     private DrawerLayout drawer;
     private LocationUtil locationUtil;
-    private String currencyCode;
+    public static String currencyCode;
     private double latitude, longitude;
     private double fxRate;
     private JsonObject allRates;

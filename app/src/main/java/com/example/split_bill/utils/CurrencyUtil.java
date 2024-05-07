@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 
 public class CurrencyUtil {
 
-    private Context context;
+    private static Context context;
     private static final String FX_URL = "https://v6.exchangerate-api.com/v6/";
     private static final String FX_URL2 = "/latest/HKD";
     private static final String API_Key = "1631409cfa5a0f4b8237be1d";
@@ -41,7 +41,7 @@ public class CurrencyUtil {
     }
 
     //Use Geocoder to get the country code based on current location
-    public String getCountryCode(double latitude, double longitude) {
+    public static String getCountryCode(double latitude, double longitude) {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
@@ -55,7 +55,7 @@ public class CurrencyUtil {
     }
 
     //Use Locale to get the Currency code based on country code
-    public String getCurrencyCode(double latitude, double longitude) {
+    public static String getCurrencyCode(double latitude, double longitude) {
         String countryCode = getCountryCode(latitude, longitude);
         if (countryCode != null) {
             try {

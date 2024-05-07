@@ -39,7 +39,7 @@ public class BalancesTabFragment extends Fragment {
     private TextView currentBalanceTextView; // Reference to the TextView
 
     public String groupId; // group name
-    private String currency = "USD-($)";
+    private String currency = "HKD ";
     private List<String> members = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
     private String curBalance = "0.0 HKD";
@@ -49,6 +49,7 @@ public class BalancesTabFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView emptyView;
     private TextView header;
+    private Double mainExchangeRate = 1.0;
     private TextView currentBalance;
     private void calculateBalances() {
         if(getActivity() == null) {
@@ -70,10 +71,27 @@ public class BalancesTabFragment extends Fragment {
 
                 dataSnapshot.child("expenses").getChildren().forEach(expenseSnapshot -> {
                     BigDecimal itemCost = new BigDecimal(expenseSnapshot.child("itemCost").getValue(String.class));
+                    String cur = (expenseSnapshot.child("currency").getValue(String.class));
 
+                    if (!cur.equals("HKD")) {
+                        FirebaseDatabase.getInstance().getReference("FXRates").child(cur).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot rateSnapshot) {
+                                mainExchangeRate = rateSnapshot.getValue(Double.class); // Get the rate as Double
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Log.e("Firebase", "Error loading rate for currency: " + cur, databaseError.toException());
+                            }
+                        });
+                    }
+                    else {
+                        mainExchangeRate = 1.0;
+                    }
 
                     String paidBy = expenseSnapshot.child("memberId").getValue(String.class);
-                    totalExpenses[0] = totalExpenses[0].add(itemCost);
+                    totalExpenses[0] = totalExpenses[0].add(itemCost.multiply(BigDecimal.valueOf(mainExchangeRate)));
                     payments.put(paidBy, payments.getOrDefault(paidBy, BigDecimal.ZERO).add(itemCost));
 
                 });
@@ -148,7 +166,7 @@ public class BalancesTabFragment extends Fragment {
             HashMap<String,Object> values = new HashMap<>(); // record the transaction details in a HashMap
             values.put("sender",PoorBalanceOwner);
             values.put("recipient", RichBalanceOwner);
-            values.put("amount",currency.charAt(5) + min.toString());
+            values.put("amount",currency + min.toString());
 
             results.add(values);
 
