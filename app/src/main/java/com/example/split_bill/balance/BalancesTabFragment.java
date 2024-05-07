@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.split_bill.R;
 import com.example.split_bill.users.User;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,17 +35,20 @@ import java.util.PriorityQueue;
 
 
 public class BalancesTabFragment extends Fragment {
+    private TextView currentBalanceTextView; // Reference to the TextView
+
     public String groupId; // group name
     private String currency = "USD-($)";
     private List<String> members = new ArrayList<>();
     private ArrayList<User> users = new ArrayList<>();
+    private String curBalance = "0.0 HKD";
     private ArraySet<String> uids = new ArraySet<>();
     private List<HashMap<String,Object>> results = new ArrayList<>();
     private BalancesTabViewAdapter adapter;
     private RecyclerView recyclerView;
     private TextView emptyView;
     private TextView header;
-
+    private TextView currentBalance;
     private void calculateBalances() {
         if(getActivity() == null) {
             return;
@@ -52,7 +56,7 @@ public class BalancesTabFragment extends Fragment {
         PriorityQueue<Balance> debtors = new PriorityQueue<>(users.size(),new BalanceComparator()); // debtors are members of the group who are owed money
         PriorityQueue<Balance> creditors = new PriorityQueue<>(users.size(),new BalanceComparator()); // creditors are members who have to pay money to the group
 
-
+        String curUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference groupRef = firebase.getReference("Groups").child(groupId);
@@ -73,13 +77,21 @@ public class BalancesTabFragment extends Fragment {
 
                 BigDecimal eachPay = totalExpenses[0].divide(new BigDecimal(users.size()),2, RoundingMode.HALF_EVEN);;
 
-
                 dataSnapshot.child("balances").getChildren().forEach(memberSnapshot -> {
                     String memberId = memberSnapshot.getKey();
+
                     BigDecimal paidAmount = payments.getOrDefault(memberId, BigDecimal.ZERO);
                     BigDecimal balance = paidAmount.subtract(eachPay);
                     User matchingUser = findUserById(memberId);
-
+                    if (memberId.equals(curUID)){
+                        Log.i("Nursultasn IDDD ==>", curUID);
+                        curBalance = balance.toString();
+                        Log.i("Nursultasn ==>", curBalance);
+                        // Update the TextView
+                        if (currentBalanceTextView != null) {
+                            currentBalanceTextView.post(() -> currentBalanceTextView.setText(curBalance + " HKD"));
+                        }
+                    }
                     if (balance.compareTo(BigDecimal.ZERO) < 0) {
                         debtors.add(new Balance(balance.abs(), memberId, matchingUser.getUsername()));  // Convert to positive as they are owed money
                     } else if (balance.compareTo(BigDecimal.ZERO) > 0) {
@@ -167,6 +179,8 @@ public class BalancesTabFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.balances_fragment,container,false);
+        currentBalanceTextView = view.findViewById(R.id.currentBalanceValue); // Make sure ID matches that in your balances_fragment.xml
+
         if(getArguments() == null || getActivity() == null) {
             return view;
         }
@@ -235,6 +249,7 @@ public class BalancesTabFragment extends Fragment {
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
             header.setVisibility(View.GONE);
+
         } else  {
             recyclerView.setVisibility(View.VISIBLE);
             header.setVisibility(View.VISIBLE);

@@ -19,6 +19,7 @@ public class BalancesTabViewAdapter extends RecyclerView.Adapter<BalancesTabView
 
     private List<HashMap<String,Object>> list = new ArrayList<>();
 
+
     static class BalanceDetailViewHolder extends RecyclerView.ViewHolder {
         private TextView textViewSender;
         private TextView textViewRecipient;
