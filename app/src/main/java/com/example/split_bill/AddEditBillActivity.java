@@ -57,6 +57,7 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
     private int requestCode;
     private int billId;
     List<MemberEntity> membersArr = new ArrayList<>();
+    List<ExpenseEntity> members = new ArrayList<>();
 
     private void saveExpense() {
         String item = editTextItem.getText().toString();
@@ -174,7 +175,7 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
 
         // spinner for selecting paidBy Member
         final Spinner spinnerPaidBy = findViewById(R.id.addBillItemPaidBy);
-        final AllMembersSpinnerAdapter allMembersSpinnerAdapter = new AllMembersSpinnerAdapter(this,new ArrayList<MemberEntity>());
+        final AllMembersSpinnerAdapter allMembersSpinnerAdapter = new AllMembersSpinnerAdapter(this,new ArrayList<ExpenseEntity>());
         allMembersSpinnerAdapter.setDropDownViewResource(0);
         spinnerPaidBy.setAdapter(allMembersSpinnerAdapter);
         spinnerPaidBy.setOnItemSelectedListener(this);
@@ -226,15 +227,15 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    String memberId = userSnapshot.getKey();
+                    memberId = userSnapshot.getKey();
                     if (memberIds.contains(memberId)) {
                         String username = userSnapshot.child("username").getValue(String.class);
-                        MemberEntity member = new MemberEntity(username, gName);
-                        membersArr.add(member);
+                        ExpenseEntity member = new ExpenseEntity(gName, username, memberId);
+                        members.add(member);
                     }
                 }
                 allMembersSpinnerAdapter.clear();
-                allMembersSpinnerAdapter.addAll(membersArr);
+                allMembersSpinnerAdapter.addAll(members);
                 allMembersSpinnerAdapter.notifyDataSetChanged();
             }
 
@@ -297,10 +298,10 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
                 break;
             case R.id.addBillItemPaidBy:
                 Log.d("t", "selected paidBy");
-                MemberEntity member = (MemberEntity) parent.getItemAtPosition(position);
+                ExpenseEntity member = (ExpenseEntity) parent.getItemAtPosition(position);
                 paidBy = member.name;
                 System.out.println("selected paidBy"+ paidBy);
-                memberId = String.valueOf(member.id);
+                memberId = member.id;
                 break;
             default:break;
         }

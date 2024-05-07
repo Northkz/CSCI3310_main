@@ -36,7 +36,7 @@ import java.util.List;
 public class ExpensesTabFragment extends Fragment {
     private String gName; // group name
     private List<BillEntity> bills = new ArrayList<>(); // maintain a list of all the existing bills of the group from the database
-    private List<MemberEntity> members = new ArrayList<>(); // maintain a list of all the existing members of the group from the database
+    private List<ExpenseEntity> members = new ArrayList<>(); // maintain a list of all the existing members of the group from the database
     private BillViewModel billViewModel;
     private ExpensesTabViewAdapter adapter;
     private StringBuilder currency = new StringBuilder();
@@ -109,7 +109,7 @@ public class ExpensesTabFragment extends Fragment {
                                 String username = userDataSnapshot.child("username").getValue(String.class);
                                 String email = userDataSnapshot.child("email").getValue(String.class);
                                 String profileImage = userDataSnapshot.child("profileImage").getValue(String.class);
-                                MemberEntity member = new MemberEntity(username, gName);
+                                ExpenseEntity member = new ExpenseEntity(gName, username, memberId);
                                 members.add(member); // Add member to the list
                             } else {
                                 Toast.makeText(getActivity(), "Failed to retrieve group members based on id. Please try again later.", Toast.LENGTH_SHORT).show();

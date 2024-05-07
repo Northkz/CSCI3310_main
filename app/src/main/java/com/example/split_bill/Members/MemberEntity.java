@@ -23,6 +23,7 @@ public class MemberEntity {
         this.name = name;
         this.gName = gName;
     }
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "Id")
     public int id;

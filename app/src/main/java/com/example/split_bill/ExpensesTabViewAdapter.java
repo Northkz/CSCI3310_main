@@ -26,7 +26,7 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
     private List<BillEntity> list = new ArrayList<>(); // maintain a list of all the existing bills in the database
     boolean multiSelect = false; // true if user has selected any item
     List<BillEntity> selectedItems = new ArrayList<>();
-    private List<MemberEntity> members = new ArrayList<>();
+    private List<ExpenseEntity> members = new ArrayList<>();
     ActionMode actionMode;
     private String gName;
     private String currency;
@@ -34,14 +34,14 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
     private ExpensesTabFragment thisOfExpenseFragment;
     private List<String> memberIds = new ArrayList<>();
 
-    ExpensesTabViewAdapter(String gName, Application application, ExpensesTabFragment thisOfExpenseFragment, List<MemberEntity> members) {
+    ExpensesTabViewAdapter(String gName, Application application, ExpensesTabFragment thisOfExpenseFragment, List<ExpenseEntity> members) {
         this.gName = gName;
         this.application = application;
         this.thisOfExpenseFragment = thisOfExpenseFragment;
         this.members = members; // Initialize the members list
     }
 
-    public void updateMembers(List<MemberEntity> members) {
+    public void updateMembers(List<ExpenseEntity> members) {
         this.members = members;
         notifyDataSetChanged(); // Notify adapter that data set has changed
     }

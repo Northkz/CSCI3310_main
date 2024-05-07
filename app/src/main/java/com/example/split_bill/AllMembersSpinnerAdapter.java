@@ -13,10 +13,10 @@ import com.example.split_bill.Members.MemberEntity;
 
 import java.util.List;
 
-public class AllMembersSpinnerAdapter extends ArrayAdapter<MemberEntity> {
-    private List<MemberEntity> list;
+public class AllMembersSpinnerAdapter extends ArrayAdapter<ExpenseEntity> {
+    private List<ExpenseEntity> list;
 
-    AllMembersSpinnerAdapter(@NonNull Context context, @NonNull List<MemberEntity> objects) {
+    AllMembersSpinnerAdapter(@NonNull Context context, @NonNull List<ExpenseEntity> objects) {
         super(context, 0, objects);
         list = objects;
     }
@@ -33,7 +33,7 @@ public class AllMembersSpinnerAdapter extends ArrayAdapter<MemberEntity> {
     }
 
     private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        MemberEntity member = getItem(position);
+        ExpenseEntity member = getItem(position);
 
         if(convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.spinner_item_member, parent, false);
@@ -49,7 +49,7 @@ public class AllMembersSpinnerAdapter extends ArrayAdapter<MemberEntity> {
     }
 
     @Override
-    public int getPosition(@Nullable MemberEntity item) {
+    public int getPosition(@Nullable ExpenseEntity item) {
         for(int i=0;i<list.size();++i) {
             if(item != null && list.get(i).id == item.id) {
                 return i;
@@ -57,12 +57,5 @@ public class AllMembersSpinnerAdapter extends ArrayAdapter<MemberEntity> {
         }
         return -1;
     }
-    public int getMemberIdByName(String memberName) {
-        for (MemberEntity member : list) {
-            if (member != null && member.getName().equals(memberName)) {
-                return member.getId();
-            }
-        }
-        return 1; // Return 0 if the member with the given name is not found
-    }
+
 }
