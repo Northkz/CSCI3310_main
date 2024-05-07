@@ -16,10 +16,5 @@ public class MemberViewModelFactory implements ViewModelProvider.Factory {
         this.gName = gName;
     }
 
-    @SuppressWarnings("unchecked")
-    @NonNull
-    @Override
-    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new MemberViewModel(application, gName);
-    }
+
 }

@@ -1,9 +1,5 @@
 package com.example.split_bill.expenses;
 
-import com.example.split_bill.Members.MemberEntity;
-
-import java.util.List;
-
 public class ExpenseEntity {
     private String gName;
     public String name;

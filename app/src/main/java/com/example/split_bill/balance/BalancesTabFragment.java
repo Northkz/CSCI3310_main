@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.split_bill.R;
 import com.example.split_bill.users.User;
+import com.example.split_bill.utils.LocationUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -69,6 +70,8 @@ public class BalancesTabFragment extends Fragment {
 
                 dataSnapshot.child("expenses").getChildren().forEach(expenseSnapshot -> {
                     BigDecimal itemCost = new BigDecimal(expenseSnapshot.child("itemCost").getValue(String.class));
+
+
                     String paidBy = expenseSnapshot.child("memberId").getValue(String.class);
                     totalExpenses[0] = totalExpenses[0].add(itemCost);
                     payments.put(paidBy, payments.getOrDefault(paidBy, BigDecimal.ZERO).add(itemCost));

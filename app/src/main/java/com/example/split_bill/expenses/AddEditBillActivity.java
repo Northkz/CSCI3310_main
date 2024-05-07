@@ -20,8 +20,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.split_bill.Group.GroupViewModel;
-import com.example.split_bill.GroupEntity;
-import com.example.split_bill.Members.MemberEntity;
 import com.example.split_bill.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,7 +46,6 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
     private String memberId;
     private int requestCode;
     private int billId;
-    List<MemberEntity> membersArr = new ArrayList<>();
     List<ExpenseEntity> members = new ArrayList<>();
 
     private void saveExpense() {
@@ -95,8 +92,7 @@ public class AddEditBillActivity extends AppCompatActivity implements AdapterVie
 
         // updates the group currency
         GroupViewModel groupViewModel = new ViewModelProvider(this).get(GroupViewModel.class);
-        GroupEntity group = new GroupEntity(gName);
-        group.gCurrency = currency;
+
 //        groupViewModel.update(group);
     }
 
