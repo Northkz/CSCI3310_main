@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey;
 @Entity(indices = {@Index(value = {"GroupName"},
         unique = true)})
 public class GroupEntity {
-    GroupEntity(String gName) {
+    public GroupEntity(String gName) {
         this.gName = gName;
     }
 

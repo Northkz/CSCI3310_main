@@ -1,7 +1,8 @@
-package com.example.split_bill;
+package com.example.split_bill.expenses;
 
 import android.app.Application;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +16,15 @@ import androidx.appcompat.view.ActionMode;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.split_bill.Members.MemberEntity;
+import com.example.split_bill.BillEntity;
+import com.example.split_bill.BillViewModel;
+import com.example.split_bill.BillViewModelFactory;
+import com.example.split_bill.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +40,40 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
     private String gName;
     private String currency;
     private Application application;
+    private String groupdId;
     private ExpensesTabFragment thisOfExpenseFragment;
     private List<String> memberIds = new ArrayList<>();
+    private DatabaseReference expensesRef;
+    ExpensesDataManager expensesDataManager;
+    private List<BillEntity> expenses = new ArrayList<>();
 
-    ExpensesTabViewAdapter(String gName, Application application, ExpensesTabFragment thisOfExpenseFragment, List<ExpenseEntity> members) {
+
+
+
+    ExpensesTabViewAdapter(String groupId, String gName, Application application, ExpensesTabFragment thisOfExpenseFragment, List<ExpenseEntity> members) {
         this.gName = gName;
         this.application = application;
         this.thisOfExpenseFragment = thisOfExpenseFragment;
         this.members = members; // Initialize the members list
+        this.groupdId = groupId;
+        this.expenses = list;
     }
 
-    public void updateMembers(List<ExpenseEntity> members) {
-        this.members = members;
-        notifyDataSetChanged(); // Notify adapter that data set has changed
+    public void updateExpensesList(List<BillEntity> expenses) {
+        this.expenses.clear(); // Clear the existing list
+        this.expenses.addAll(expenses); // Add the new expense data to the list
+//        for (BillEntity expense : expenses) {
+//            Log.d("ExpenseDetails", "Expense Item: " + expense.getItem());
+//            Log.d("ExpenseDetails", "Expense Cost: " + expense.getCost());
+//            // Add more Log statements for other details as needed
+//        }
+        this.expenses = list;
+        for (BillEntity expense : list) {
+            Log.d("ExpenseDetail00", "Expense Item: " + expense.getItem());
+            Log.d("ExpenseDetails00", "Expense Cost: " + expense.getCost());
+        }
+
+        notifyDataSetChanged(); // Notify the adapter that the data set has changed
     }
     /*
     handles all kinds of action when ActionMode is active.
@@ -154,34 +184,45 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
     // note that this method is called for every ExpenseDetailViewHolder
     @Override
     public void onBindViewHolder(@NonNull ExpenseDetailViewHolder holder, int position) {
-        StringBuilder justText = new StringBuilder();
-        justText.append("Paid By: ");
-        String paidById = "";
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).getName().equals(list.get(position).paidBy)) {
-                paidById = memberIds.get(i);
-                break;
-            }
-        }
-        final ExpenseDetailViewHolder hold = holder;
-        holder.textViewItem.setText(list.get(position).item); // set bill item to holder
-        holder.textViewCost.setText(list.get(position).cost); // set bill cost to holder
-        holder.textViewCurrency.setText(Character.toString(currency.charAt(5))); // set bill currency to holder. charAt(5) holds the currency symbol(like in USD-($))
-        holder.textViewId.setText(paidById);
-        holder.update(list.get(position));
+        BillEntity bill = list.get(position);
+        System.out.println("wehere");
+        Log.d("ExpenseDetails11", "Item Name: " + bill.getItem());
+        Log.d("ExpenseDetails11", "Cost: " + bill.getCost());
 
-        final int pos = position;
+
+        holder.textViewItem.setText(bill.getItem()); // Assuming getItemName() returns the item name
+        holder.textViewCost.setText(String.valueOf(bill.getCost())); // Assuming getCost() returns the cost as a double or float
+        holder.textViewCurrency.setText(currency); // Set currency symbol
+        holder.textViewPaidBy.setText("Paid By: " + bill.getPaidBy()); // Assuming getPaidBy() returns the name of the person who paid
+        holder.textViewId.setText(bill.getId());
+//        StringBuilder justText = new StringBuilder();
+//        justText.append("Paid By: ");
+//        String paidById = "";
+//        for (int i = 0; i < members.size(); i++) {
+//            if (members.get(i).getName().equals(list.get(position).paidBy)) {
+//                paidById = memberIds.get(i);
+//                break;
+//            }
+//        }
+//        final ExpenseDetailViewHolder hold = holder;
+//        holder.textViewItem.setText(list.get(position).itemName); // set bill item to holder
+//        holder.textViewCost.setText(list.get(position).itemCost); // set bill cost to holder
+//        holder.textViewCurrency.setText(Character.toString(currency.charAt(5))); // set bill currency to holder. charAt(5) holds the currency symbol(like in USD-($))
+//        holder.textViewId.setText(paidById);
+//        holder.update(list.get(position));
+//
+//        final int pos = position;
 
         // attach a click listener to the ExpenseDetailViewHolder
+        holder.update(bill);
+
+        // Set click listener
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Note that if the user is in multiSelect mode, the function for individual click on any item shouldn't be initiated
-                if(multiSelect) { // if multiSelect is On, clicking on any item should only highlight it and add it to our selectedItems list
-                    hold.selectItem(list.get(pos));
-                }
-                if(listener != null && !multiSelect) { // if multiSelect is Off, clicking on any item should initiate edit expense intent
-                    listener.onItemClick(list.get(pos)); // onItemClick method defined in ExpensesTabFragment[line 84]
+                // Handle item click event
+                if (listener != null && !multiSelect) {
+                    listener.onItemClick(bill);
                 }
             }
         });
@@ -189,10 +230,15 @@ public class ExpensesTabViewAdapter extends RecyclerView.Adapter<ExpensesTabView
 
     @Override
     public int getItemCount() {
+        Log.d("yadag", "count: " + list.size());
         return list.size();
     }
 
     void storeToList(List<BillEntity> billEntities, String currency) {
+        Log.d("yadag", "Cost: " + currency);
+        for (BillEntity billEntity : billEntities) {
+            Log.d("llrve", "Name: " + billEntity.getItem() + ", Cost: " + billEntity.getCost());
+        }
         list = billEntities;
         this.currency = currency;
         notifyDataSetChanged();

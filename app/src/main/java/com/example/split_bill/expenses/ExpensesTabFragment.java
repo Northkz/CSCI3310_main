@@ -1,4 +1,4 @@
-package com.example.split_bill;
+package com.example.split_bill.expenses;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,9 +18,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.split_bill.BillEntity;
+import com.example.split_bill.BillViewModel;
+import com.example.split_bill.BillViewModelFactory;
 import com.example.split_bill.Group.GroupListActivity;
 import com.example.split_bill.Group.GroupViewModel;
-import com.example.split_bill.Members.MemberEntity;
+import com.example.split_bill.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +44,7 @@ public class ExpensesTabFragment extends Fragment {
 
     private String groupId;
 
-    static ExpensesTabFragment newInstance(String gName, String groupId) {
+    public static ExpensesTabFragment newInstance(String gName, String groupId) {
         Bundle args = new Bundle();
         args.putString("group_name", gName);
         args.putString("group_id", groupId);
@@ -67,14 +70,35 @@ public class ExpensesTabFragment extends Fragment {
         groupId = getArguments().getString("group_id"); // get group ID from bundle
 
         Log.d("GroupID", "Group ID: " + groupId);
+//        ExpensesDataManager expensesDataManager = new ExpensesDataManager(groupId);
+//        expensesDataManager.retrieveExpensesData();
         // prepare recycler view for displaying all expenses of the group
         RecyclerView recyclerView = view.findViewById(R.id.expensesRecyclerView);
         recyclerView.setHasFixedSize(true);
-        if(getActivity() != null) {
-            adapter = new ExpensesTabViewAdapter(gName, getActivity().getApplication(), this, members);
-        }
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new ExpensesTabViewAdapter(groupId, gName, getActivity().getApplication(), this, members);
         recyclerView.setAdapter(adapter);
+        if(getActivity() != null) {
+            adapter = new ExpensesTabViewAdapter(groupId, gName, getActivity().getApplication(), this, members);
+        }
+        ExpensesDataManager expensesDataManager = new ExpensesDataManager(groupId, adapter);
+        expensesDataManager.retrieveExpensesData();
+        expensesDataManager.setOnDataChangeListener(new ExpensesDataManager.OnDataChangeListener() {
+            @Override
+            public void onDataChange(List<BillEntity> billEntities) {
+                // Update the adapter with the new list of BillEntity objects
+                adapter.storeToList(billEntities, currency.toString());
+                // Optionally, you can store the new list locally in ExpensesTabFragment
+                bills = billEntities;
+                for (BillEntity bill : billEntities) {
+                    Log.d("BillEntity", "Item: " + bill.getItem());
+                    Log.d("BillEntity", "Cost: " + bill.getCost());
+                    Log.d("BillEntity", "Paid By: " + bill.getPaidBy());
+                    // Add more details to log if needed
+                }
+            }
+        });
 
         // if data in database(BillEntity) changes, call the onChanged() below
         billViewModel = new ViewModelProvider(this,new BillViewModelFactory(getActivity().getApplication(),gName)).get(BillViewModel.class);
@@ -174,6 +198,14 @@ public class ExpensesTabFragment extends Fragment {
 //        });
 
         return view;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Initialize ExpensesDataManager and retrieve expenses data
+        ExpensesDataManager expensesDataManager = new ExpensesDataManager(groupId, adapter);
+        expensesDataManager.retrieveExpensesData();
     }
 
     @Override

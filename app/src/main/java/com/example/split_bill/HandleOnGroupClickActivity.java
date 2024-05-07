@@ -12,6 +12,7 @@ import com.example.split_bill.Group.GroupListActivity;
 import com.example.split_bill.balance.BalancesTabFragment;
 import com.example.split_bill.chats.ChatFragment;
 import com.example.split_bill.Members.MembersTabFragment;
+import com.example.split_bill.expenses.ExpensesTabFragment;
 import com.google.android.material.tabs.TabLayout;
 
 // This activity is initiated if the user clicks on any group while on the GroupList activity.

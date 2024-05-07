@@ -1,4 +1,4 @@
-package com.example.split_bill;
+package com.example.split_bill.expenses;
 
 import com.example.split_bill.Members.MemberEntity;
 

@@ -1,4 +1,4 @@
-package com.example.split_bill;
+package com.example.split_bill.expenses;
 
 public class Expense {
     private String memberId;
