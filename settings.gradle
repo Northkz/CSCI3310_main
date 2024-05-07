@@ -16,5 +16,5 @@ dependencyResolutionManagement {
         )
     }
 }
-rootProject.name = "SPLIT-BILL"
+rootProject.name = "CUSplit"
 include ':app'
