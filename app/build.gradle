@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.split_bill'
+    namespace 'com.example.CUSplit'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.split_bill"
+        applicationId "com.example.CUSplit"
         minSdk 24
         targetSdk 34
         versionCode 1
