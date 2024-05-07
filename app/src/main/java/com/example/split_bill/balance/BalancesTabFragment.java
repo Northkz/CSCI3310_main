@@ -84,9 +84,7 @@ public class BalancesTabFragment extends Fragment {
                     BigDecimal balance = paidAmount.subtract(eachPay);
                     User matchingUser = findUserById(memberId);
                     if (memberId.equals(curUID)){
-                        Log.i("Nursultasn IDDD ==>", curUID);
                         curBalance = balance.toString();
-                        Log.i("Nursultasn ==>", curBalance);
                         // Update the TextView
                         if (currentBalanceTextView != null) {
                             currentBalanceTextView.post(() -> currentBalanceTextView.setText(curBalance + " HKD"));

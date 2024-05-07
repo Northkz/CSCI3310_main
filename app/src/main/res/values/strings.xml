@@ -2,10 +2,11 @@
     <string name="app_name">Split It Easy</string>
 
     <string-array name="currencySymbols">
-        <item>INR-(₹)</item>
-        <item>USD-($)</item>
-        <item>EUR-(€)</item>
-        <item>YEN-(¥)</item>
+        <item>HKD</item>
+        <item>USD</item>
+        <item>INR</item>
+        <item>EUR</item>
+        <item>YEN</item>
     </string-array>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
