@@ -6,20 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".chats.ChatFragment">
 
+    <!-- RecyclerView for displaying messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/message_et"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- EditText for typing new messages -->
     <EditText
         android:id="@+id/message_et"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/message_et_shape"
         android:hint="Type your message..."
         android:padding="13dp"
@@ -27,16 +31,16 @@
         app:layout_constraintEnd_toStartOf="@+id/send_message_btn"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Button for sending the message -->
     <ImageButton
         android:id="@+id/send_message_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/send_icon"
-        app:backgroundTint="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
         android:layout_marginEnd="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/message_et"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/message_et" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

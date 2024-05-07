@@ -122,6 +122,7 @@ public class CreateNewGroupsActivity extends AppCompatActivity {
         String groupId = newGroupRef.getKey(); // This is the unique ID for the new group
 
         Map<String, Object> groupInfo = new HashMap<>();
+        selectedUserIds.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
         groupInfo.put("groupName", groupName);
         groupInfo.put("members", selectedUserIds);
         groupInfo.put("currency", "");
@@ -154,7 +155,6 @@ public class CreateNewGroupsActivity extends AppCompatActivity {
         Map<String, Object> chatInfo = new HashMap<>();
         chatInfo.put("chat_name", groupName);
 
-        selectedUserIds.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
         chatInfo.put("members", selectedUserIds);
 
         // Now use the reference to set the chat info
@@ -162,7 +162,6 @@ public class CreateNewGroupsActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Group chat created successfully", Toast.LENGTH_SHORT).show();
                     // Use the chat ID in your addChatIdToUser method inside the success listener
-                    addChatIdToUser(FirebaseAuth.getInstance().getCurrentUser().getUid(), chatId);
                     for (String userId : selectedUserIds) {
                         addChatIdToUser(userId, chatId);
                     }

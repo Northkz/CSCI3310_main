@@ -34,6 +34,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = messages.get(position);
 
+        holder.username_tv.setText(message.getOwnerName());
         holder.messageTv.setText(message.getText());
         holder.dateTv.setText(message.getDate());
     }
@@ -53,13 +54,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
     static class MessageViewHolder extends RecyclerView.ViewHolder{
 
-        TextView messageTv, dateTv;
+        TextView messageTv, dateTv,username_tv;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
 
             messageTv = itemView.findViewById(R.id.message_tv);
             dateTv = itemView.findViewById(R.id.message_date_tv);
+            username_tv = itemView.findViewById(R.id.message_owner);
         }
     }
 }

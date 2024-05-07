@@ -2,13 +2,22 @@ package com.example.split_bill.chats.message;
 
 public class Message {
 
-    private String id, ownerId, text, date;
+    private String id, ownerId, text, date, ownerName;
 
-    public Message(String id, String ownerId, String text, String date) {
+    public Message(String id, String ownerId, String text, String date, String name) {
         this.id = id;
         this.ownerId = ownerId;
         this.text = text;
         this.date = date;
+        this.ownerName = name;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public String getId() {
