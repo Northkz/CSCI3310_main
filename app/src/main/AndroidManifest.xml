@@ -26,7 +26,7 @@
             android:name=".AddEditMemberActivity"
             android:exported="false" />
         <activity
-            android:name=".AddEditBillActivity"
+            android:name=".expenses.AddEditBillActivity"
             android:exported="false" />
         <activity
             android:name=".HandleOnGroupClickActivity"

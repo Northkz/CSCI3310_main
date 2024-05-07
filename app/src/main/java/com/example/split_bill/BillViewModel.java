@@ -10,7 +10,7 @@ import java.util.List;
 
 public class BillViewModel extends AndroidViewModel {
     private BillRepository repository;
-    private LiveData<List<BillEntity>> allBills;
+    public LiveData<List<BillEntity>> allBills;
 
     BillViewModel(@NonNull Application application,String gName) {
         super(application);
@@ -34,7 +34,7 @@ public class BillViewModel extends AndroidViewModel {
         repository.deleteAll(gName);
     }
 
-    LiveData<List<BillEntity>> getAllBills() {
+    public LiveData<List<BillEntity>> getAllBills() {
         return allBills;
     }
 

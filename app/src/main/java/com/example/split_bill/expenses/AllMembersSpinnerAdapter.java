@@ -1,4 +1,4 @@
-package com.example.split_bill;
+package com.example.split_bill.expenses;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.split_bill.Members.MemberEntity;
+import com.example.split_bill.R;
+import com.example.split_bill.expenses.ExpenseEntity;
 
 import java.util.List;
 

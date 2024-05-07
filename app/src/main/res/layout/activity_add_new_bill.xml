@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:padding="0dp"
     tools:ignore="HardcodedText"
-    tools:context=".AddEditBillActivity">
+    tools:context=".expenses.AddEditBillActivity">
 
     <include layout="@layout/toolbar"
         android:id="@+id/addBillToolbar"/>
