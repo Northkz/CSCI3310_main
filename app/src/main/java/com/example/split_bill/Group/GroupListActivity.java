@@ -38,7 +38,7 @@ public class GroupListActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        setTitle("Groups");
+        setTitle("Group List");
 
         RecyclerView recyclerView = findViewById(R.id.group_list_recycler_view);
         recyclerView.setHasFixedSize(true);

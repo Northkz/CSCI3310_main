@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
     android:orientation="vertical"
-    android:background="@color/lavendor"
+    android:background="@color/cuhk"
     android:id="@+id/drawer_layout"
     android:fitsSystemWindows="true"
     tools:ignore="HardcodedText"
@@ -26,7 +26,7 @@
                 android:id="@+id/activity_main_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#D27C4DFF"
+                android:background="@color/cuhk"
                 tools:ignore="UnusedAttribute"
                 android:elevation="4dp"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -77,7 +77,7 @@
                             android:layout_width="64dp"
                             android:layout_height="64dp"
                             android:contentDescription="List All groups"
-                            android:background="@drawable/ic_groups_icon"
+                            android:background="@drawable/groups"
                             android:padding="10dp"/>
                         <TextView
                             android:layout_width="wrap_content"
@@ -137,7 +137,7 @@
                         <ImageView
                             android:layout_width="64dp"
                             android:layout_height="64dp"
-                            android:background="@drawable/ic_groups_icon"
+                            android:background="@drawable/groups"
                             android:contentDescription="Create new group"
                             android:padding="10dp"/>
                         <TextView
