@@ -1,6 +1,11 @@
 package com.example.CUSplit;
 
 import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//GROUP 14
+// Names: Kambar Nursultan, Munkhbileg Batdorj, Chu Tsz Chim James
+// SID: 1155147668, 1155155853, 1155142348
+
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
