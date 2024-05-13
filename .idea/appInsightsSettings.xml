@@ -8,8 +8,8 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.split_bill" />
-                  <option name="mobileSdkAppId" value="1:1083615471351:android:3fdd144bad9c655a7bd5f2" />
+                  <option name="appId" value="com.example.CUSplit" />
+                  <option name="mobileSdkAppId" value="1:1083615471351:android:a0128625c3baa6eb7bd5f2" />
                   <option name="projectId" value="splitspend-b9914" />
                   <option name="projectNumber" value="1083615471351" />
                 </ConnectionSetting>

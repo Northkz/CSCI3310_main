@@ -178,7 +178,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (requestCode == 2 && resultCode == RESULT_OK && data != null) {
            Uri selectedImage = data.getData();
-            ImageUtil.uploadImageToFirebase(selectedImage, this);
+            ImageUtil.uploadImageToFirebase(selectedImage, this, "users-profileImg")
+                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri imageUrl) {
+                            // Update the profileImage attribute for the current user in the Firebase Realtime Database
+                            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
+                            userRef.child("profileImage").setValue(imageUrl.toString())
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Image URL saved successfully, update UI or show a message
+                                            Toast.makeText(MainActivity.this, "Profile image uploaded successfully", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // Error occurred while saving image URL, show error message
+                                            Toast.makeText(MainActivity.this, "Failed to upload profile image", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Handle upload failure
+                            Toast.makeText(MainActivity.this, "Failed to upload profile image", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
         }
     }

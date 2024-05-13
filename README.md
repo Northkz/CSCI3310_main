@@ -39,9 +39,6 @@ The project utilizes the following dependencies:
 
 The `build.gradle` file contains configuration settings such as compile SDK version, dependencies, and build types.
 
-## Contributing
-
-Contributions to the project are welcome. If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
 
 ## License
 
